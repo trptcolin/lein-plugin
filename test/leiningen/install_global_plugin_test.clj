@@ -1,5 +1,5 @@
-(ns lein-install-global-plugin.test.core
-  (:use [lein-install-global-plugin.core] :reload)
+(ns leiningen.install-global-plugin-test
+  (:use [leiningen.install-global-plugin] :reload)
   (:use [clojure.test]))
 
 (deftest replace-me ;; FIXME: write
