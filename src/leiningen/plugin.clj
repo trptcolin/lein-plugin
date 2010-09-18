@@ -13,8 +13,7 @@
 
 (def plugins-path (file (home-dir) "plugins"))
 
-(defn plugin [_ project-name version]
-  ; _ means "install" for now...
+(defn plugin-install [project-name version]
   (install project-name version)
   (let [[name group] ((juxt name namespace) (symbol project-name))
         temp-project (format "/tmp/lein-%s" (java.util.UUID/randomUUID))
@@ -32,4 +31,25 @@
                       (cons (file jarfile)))]
         (write-components deps out)))
     (println "Created" standalone-filename)))
+
+(defn plugin-help []
+  (println "Plugin tasks available:
+
+  install         Download, package, and install plugin jarfile into
+                    ~/.lein/plugins
+                  Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
+                    You can use the same syntax here as when listing Leiningen
+                    dependencies.
+
+  help            Show this screen
+"))
+
+(defn plugin
+  ([] (plugin-help))
+  ([_] (plugin-help))
+  ([_ _] (plugin-help))
+  ([subtask project-name version]
+    (case subtask
+      "install" (plugin-install project-name version)
+      (plugin-help))))
 
