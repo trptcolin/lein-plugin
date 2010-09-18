@@ -19,7 +19,13 @@
 (defn extract-name-and-group [project-name]
   ((juxt name namespace) (symbol project-name)))
 
-(defn plugin-install [project-name version]
+(defn plugin-install
+  "Download, package, and install plugin jarfile into
+                     ~/.lein/plugins
+                   Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
+                     You can use the same syntax here as when listing Leiningen
+                     dependencies."
+  [project-name version]
   (install project-name version)
   (let [[name group] (extract-name-and-group project-name)
         temp-project (format "/tmp/lein-%s" (java.util.UUID/randomUUID))
@@ -38,24 +44,20 @@
         (write-components deps out)))
     (println "Created" standalone-filename)))
 
-(defn plugin-uninstall [project-name version]
+(defn plugin-uninstall
+  "Delete the plugin jarfile
+                    Syntax: lein plugin uninstall GROUP/ARTIFACT-ID"
+  [project-name version]
   (let [[name group] (extract-name-and-group project-name)]
     (.delete (file plugins-path (plugin-standalone-filename group name version)))))
 
-(defn plugin-help []
-  (println "Plugin tasks available:
-
-  install         Download, package, and install plugin jarfile into
-                    ~/.lein/plugins
-                  Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
-                    You can use the same syntax here as when listing Leiningen
-                    dependencies.
-
-  uninstall       Delete the plugin jarfile
-                    Syntax: lein plugin uninstall GROUP/ARTIFACT-ID
-
-  help            Show this screen
-"))
+(defn plugin-help
+  "Show plugin subtasks"
+  []
+  (println (str "Plugin tasks available:\n
+  install         " (:doc (meta #'plugin-install)) "\n
+  uninstall       " (:doc (meta #'plugin-uninstall)) "\n
+  help            " (:doc (meta #'plugin-help)) "\n")))
 
 (defn plugin
   ([] (plugin-help))
