@@ -2,21 +2,31 @@
 
 Plugin for [Leiningen](http://github.com/technomancy/leiningen)
 
-## Usage
-
-Call the plugin task with the same arguments you would put in
-the Leiningen :dev-dependencies if you only wanted to use this on a single
-project.
-
-    % lein plugin install lein-clojars "0.6.0"
-    % lein plugin install lein-release/lein-release "1.1.1"
-    % lein plugin uninstall lein-clojars "0.6.0"
-    % lein plugin help
-
 ## Installation
 
-    % lein deps
+    % git clone git://github.com/trptcolin/lein-plugin.git
+    % cd lein-plugin
     % lein plugin install lein-plugin "0.0.1"
+
+## Usage
+
+Once you're installed, you can call the plugin task from anywhere.
+
+    % lein plugin help
+
+Use the same arguments you would put in the Leiningen :dev-dependencies if you
+were only using the plugin on a single project.
+
+    % lein plugin install lein-clojars/lein-clojars "0.6.0"
+
+You can also use the simplified version where the group and artifact id are the
+same, and even leave out the parentheses if you want.
+
+    % lein plugin install lein-clojars 0.6.0
+
+You can also easily uninstall plugins through the task.
+
+    % lein plugin uninstall lein-clojars 0.6.0
 
 
 ## License
