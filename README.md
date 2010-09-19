@@ -1,6 +1,7 @@
-# lein-install-global-plugin
+# lein-plugin
 
-Plugin for [Leiningen](http://github.com/technomancy/leiningen)
+Plugin for [Leiningen](http://github.com/technomancy/leiningen) to manage other
+Leiningen plugins.
 
 ## Installation
 
