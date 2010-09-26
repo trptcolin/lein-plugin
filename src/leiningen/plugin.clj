@@ -6,8 +6,8 @@
         [leiningen.jar :only (local-repo-path
                               extract-jar
                               get-default-uberjar-name)]
-        [leiningen.install :only (install)]
         [clojure.java.io :only (file)])
+  (:require [leiningen.install])
   (:import [java.util.zip ZipOutputStream]
            [java.io File FileOutputStream]))
 
@@ -19,14 +19,14 @@
 (defn extract-name-and-group [project-name]
   ((juxt name namespace) (symbol project-name)))
 
-(defn plugin-install
+(defn install
   "Download, package, and install plugin jarfile into
   ~/.lein/plugins
 Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
   You can use the same syntax here as when listing Leiningen
   dependencies."
   [project-name version]
-  (install project-name version)
+  (leiningen.install/install project-name version)
   (let [[name group] (extract-name-and-group project-name)
         temp-project (format "/tmp/lein-%s" (java.util.UUID/randomUUID))
         jarfile (-> (local-repo-path name (or group name) version)
@@ -44,7 +44,7 @@ Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
         (write-components deps out)))
     (println "Created" standalone-filename)))
 
-(defn plugin-uninstall
+(defn uninstall
   "Delete the plugin jarfile
   Syntax: lein plugin uninstall GROUP/ARTIFACT-ID VERSION"
   [project-name version]
@@ -52,13 +52,11 @@ Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
     (.delete (file plugins-path
                (plugin-standalone-filename group name version)))))
 
-(defn plugin-help
+(declare help-map)
+(defn help
   "Show plugin subtasks"
   []
-  (let [help-map {"help"      (:doc (meta #'plugin-help))
-                  "install"   (:doc (meta #'plugin-install))
-                  "uninstall" (:doc (meta #'plugin-uninstall))}
-        longest-key-length (apply max (map count (keys help-map)))]
+  (let [longest-key-length (apply max (map count (keys help-map)))]
     (println (str "Plugin tasks available:\n"))
     (doall (map
              (fn [[k v]]
@@ -75,13 +73,20 @@ Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
                          v))))))
              help-map))))
 
+(def help-map
+  (into {}
+    (map (fn [subtask]
+           [(str (:name (meta subtask)))
+            (:doc (meta subtask))])
+    [#'help #'install #'uninstall])))
+
 (defn plugin
-  ([] (plugin-help))
-  ([_] (plugin-help))
-  ([_ _] (plugin-help))
+  ([] (help))
+  ([_] (help))
+  ([_ _] (help))
   ([subtask project-name version]
     (case subtask
-      "install" (plugin-install project-name version)
-      "uninstall" (plugin-uninstall project-name version)
-      (plugin-help))))
+      "install" (install project-name version)
+      "uninstall" (uninstall project-name version)
+      (help))))
 
