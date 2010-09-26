@@ -21,10 +21,10 @@
 
 (defn plugin-install
   "Download, package, and install plugin jarfile into
-                     ~/.lein/plugins
-                   Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
-                     You can use the same syntax here as when listing Leiningen
-                     dependencies."
+  ~/.lein/plugins
+Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
+  You can use the same syntax here as when listing Leiningen
+  dependencies."
   [project-name version]
   (install project-name version)
   (let [[name group] (extract-name-and-group project-name)
@@ -46,7 +46,7 @@
 
 (defn plugin-uninstall
   "Delete the plugin jarfile
-                    Syntax: lein plugin uninstall GROUP/ARTIFACT-ID"
+  Syntax: lein plugin uninstall GROUP/ARTIFACT-ID VERSION"
   [project-name version]
   (let [[name group] (extract-name-and-group project-name)]
     (.delete (file plugins-path (plugin-standalone-filename group name version)))))
@@ -54,10 +54,22 @@
 (defn plugin-help
   "Show plugin subtasks"
   []
-  (println (str "Plugin tasks available:\n
-  install         " (:doc (meta #'plugin-install)) "\n
-  uninstall       " (:doc (meta #'plugin-uninstall)) "\n
-  help            " (:doc (meta #'plugin-help)) "\n")))
+  (let [help-map {"help"      (:doc (meta #'plugin-help))
+                  "install"   (:doc (meta #'plugin-install))
+                  "uninstall" (:doc (meta #'plugin-uninstall))}
+        longest-key-length (apply max (map count (keys help-map)))]
+    (println (str "Plugin tasks available:\n"))
+    (doall (map
+             (fn [[k v]]
+               (let [padding (+ 3 longest-key-length (- (count k)))]
+                 (println
+                   (format (str "%1s" (apply str (repeat padding " ")) "%2s")
+                     k
+                     (apply str
+                       (replace
+                         {\newline (apply str (cons \newline (repeat (+ padding (count k)) " ")))}
+                         v))))))
+             help-map))))
 
 (defn plugin
   ([] (plugin-help))
