@@ -46,39 +46,48 @@ Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
 
 (defn uninstall
   "Delete the plugin jarfile
-  Syntax: lein plugin uninstall GROUP/ARTIFACT-ID VERSION"
+Syntax: lein plugin uninstall GROUP/ARTIFACT-ID VERSION"
   [project-name version]
   (let [[name group] (extract-name-and-group project-name)]
     (.delete (file plugins-path
                (plugin-standalone-filename group name version)))))
 
-(declare help-map)
+(defn- formatted-docstring [command docstring padding]
+  (apply str
+    (replace
+      {\newline
+       (apply str (cons
+                    \newline
+                    (repeat (+ padding (count command)) " ")))}
+      docstring)))
+
+(def help-padding 3)
+
+(defn- formatted-help [command docstring longest-key-length]
+  (let [padding (+ longest-key-length help-padding (- (count command)))]
+    (format (str "%1s" (apply str (repeat padding " ")) "%2s")
+      command
+      (formatted-docstring command docstring padding))))
+
+(declare help)
+(defn- get-help-map []
+  (into {}
+    (map
+      (fn [subtask]
+        [(str (:name (meta subtask))) (:doc (meta subtask))])
+      [#'help #'install #'uninstall])))
+
 (defn help
   "Show plugin subtasks"
   []
-  (let [longest-key-length (apply max (map count (keys help-map)))]
+  (let [help-map (get-help-map)
+        longest-key-length (apply max (map count (keys help-map)))]
     (println (str "Plugin tasks available:\n"))
     (doall (map
-             (fn [[k v]]
-               (let [padding (+ 3 longest-key-length (- (count k)))]
-                 (println
-                   (format (str "%1s" (apply str (repeat padding " ")) "%2s")
-                     k
-                     (apply str
-                       (replace
-                         {\newline
-                          (apply str (cons
-                                       \newline
-                                       (repeat (+ padding (count k)) " ")))}
-                         v))))))
-             help-map))))
+             (fn [[k v]] (println (formatted-help k v longest-key-length)))
+             help-map))
+    (println)))
 
-(def help-map
-  (into {}
-    (map (fn [subtask]
-           [(str (:name (meta subtask)))
-            (:doc (meta subtask))])
-    [#'help #'install #'uninstall])))
 
 (defn plugin
   ([] (help))
