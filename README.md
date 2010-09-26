@@ -7,7 +7,7 @@ Leiningen plugins.
 
     % git clone git://github.com/trptcolin/lein-plugin.git
     % cd lein-plugin
-    % lein plugin install lein-plugin "0.0.1"
+    % lein plugin install lein-plugin "0.1.0"
 
 ## Usage
 
