@@ -49,7 +49,8 @@ Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
   Syntax: lein plugin uninstall GROUP/ARTIFACT-ID VERSION"
   [project-name version]
   (let [[name group] (extract-name-and-group project-name)]
-    (.delete (file plugins-path (plugin-standalone-filename group name version)))))
+    (.delete (file plugins-path
+               (plugin-standalone-filename group name version)))))
 
 (defn plugin-help
   "Show plugin subtasks"
@@ -67,7 +68,10 @@ Syntax: lein plugin install GROUP/ARTIFACT-ID VERSION
                      k
                      (apply str
                        (replace
-                         {\newline (apply str (cons \newline (repeat (+ padding (count k)) " ")))}
+                         {\newline
+                          (apply str (cons
+                                       \newline
+                                       (repeat (+ padding (count k)) " ")))}
                          v))))))
              help-map))))
 
