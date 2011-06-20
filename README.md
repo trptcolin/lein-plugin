@@ -1,5 +1,7 @@
 # lein-plugin
 
+## NOTE: This plugin has been merged into Leiningen as of v1.4.0
+
 Plugin for [Leiningen](http://github.com/technomancy/leiningen) to manage other
 Leiningen plugins.
 
